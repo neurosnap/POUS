@@ -25,7 +25,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +36,12 @@ public class apviewActivity extends Activity {
 	 List<ScanResult> wifiList;
 	 
 	 //delay before app scans for access points
-	 int read_latency = 1000;
+	 int read_latency = SavedSettings.dur_read_cycle * 1000;
+	 //int read_latency = 1000;
+	 //max number of continuously stored access point data based on time
+	 int max_list_stored = SavedSettings.num_of_saved_reads;
+	 //int max_list_stored = 3;
+
 	 //# of reads since last save
 	 int reads_since_save = 0;
 	 
@@ -49,11 +53,9 @@ public class apviewActivity extends Activity {
 	 
 	 //stores current access point data
 	 ArrayList<ArrayList<AccessPoint>> latest_reads = new ArrayList<ArrayList<AccessPoint>>();
-	 //max number of continuously stored access point data based on time
-	 int max_list_stored = 3;
 	 
 	 //HashMap of all saved locations and their delta to current read
-	 //HashMap<String, Float> winner = new HashMap<String, Float>();
+	 //HashMap<String, Integer> winner = new HashMap<String, Integer>();
 	 
 	 public void onCreate(Bundle savedInstanceState) {
 		  super.onCreate(savedInstanceState);
@@ -187,6 +189,16 @@ public class apviewActivity extends Activity {
 		 readAPs();
 	 }
 	 
+	 protected void onResume() {
+		 super.onResume();
+		//delay before app scans for access points
+		 read_latency = SavedSettings.dur_read_cycle * 1000;
+		 //int read_latency = 1000;
+		 //max number of continuously stored access point data based on time
+		 max_list_stored = SavedSettings.num_of_saved_reads;
+		 //int max_list_stored = 3;
+	 }
+	 
 	 //over ride onStop, which is part of an app's lifecycle
 	 protected void onStop() {
 		 super.onStop();
@@ -279,21 +291,18 @@ public class apviewActivity extends Activity {
 				//ap data and the saved location ap data
 				if (!locs.isEmpty() && locs.size() > 1) {
 					
-					//View listview =  findViewById(R.id.loc_winner);
-					
-					ListView listView = (ListView) findViewById(android.R.id.list);
 					String winner_out = "";
 					float value = 0;
-						
-						for (Map.Entry<String, ArrayList<ArrayList<AccessPoint>>> entry : locs.entrySet()) {
-							value = compareAP(entry.getValue(), latest_reads);
-							
-							TextView loc = new TextView(getApplicationContext());
-							//winner.put(entry.getKey().toString(), value);
-							winner_out += entry.getKey() + ": " + value + "\n";
-						}
 					
-					//loc_winner.setText(winner_out);
+					TextView loc_winner = (TextView) findViewById(R.id.loc_winner);
+					
+					for (Map.Entry<String, ArrayList<ArrayList<AccessPoint>>> entry : locs.entrySet()) {
+						value = compareAP(entry.getValue(), latest_reads);
+
+						winner_out += entry.getKey() + ": " + value + "\n";
+					}
+					
+					loc_winner.setText(winner_out);
 					
 				}
 				

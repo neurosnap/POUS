@@ -4,8 +4,8 @@
     <string name="update_locs">Update APs</string>
     <string name="save_locs">Save Loc</string>
     <string name="update_pos">Current APs Loading ...</string>
-    <string name="locations">Choose a Location</string>
     <string name="loc_winner_text">Winner not available until two locations are saved</string>
+    <string name="locations">Choose a Location</string>
     
     <string-array name="locations_array">
     	<item>LOC 1</item>
@@ -14,5 +14,61 @@
     	<item>LOC 4</item>
     	<item>LOC 5</item>
     </string-array>
+    
+    <string name="num_aps_text">Max Number of APs</string>
+    <string name="num_aps_spinner_text">Choose Value</string>
+    
+    <string-array name="num_aps_array">
+    	<item>1</item>
+    	<item>2</item>
+    	<item>3</item>
+    	<item>4</item>
+    	<item>5</item>
+    	<item>6</item>
+    	<item>7</item>
+    	<item>8</item>
+    	<item>9</item>
+    	<item>10</item>
+    	<item>11</item>
+    	<item>12</item>
+    	<item>13</item>
+    	<item>14</item>
+    	<item>15</item>
+    </string-array>
+    
+    <string name="num_reads_text">Max Number of Reads</string>
+    <string name="num_reads_spinner_text">Choose Value</string>
+    
+    <string-array name="num_reads_array">
+    	<item>1</item>
+    	<item>2</item>
+    	<item>3</item>
+    	<item>4</item>
+    	<item>5</item>
+    	<item>6</item>
+    	<item>7</item>
+    	<item>8</item>
+    	<item>9</item>
+    	<item>10</item>
+    	<item>11</item>
+    	<item>12</item>
+    	<item>13</item>
+    	<item>14</item>
+    	<item>15</item>
+    </string-array>
+    
+    <string name="dur_cycle_text">Read Duration Cycle</string>
+    <string name="dur_cycle_spinner_text">Choose Interval</string>
+    
+    <string-array name="dur_cycle_array">
+    	<item>1</item>
+    	<item>2</item>
+    	<item>3</item>
+    	<item>5</item>
+    	<item>10</item>
+    	<item>15</item>
+    </string-array>
+    
+    <string name="save_settings">Save Settings</string>
     
 </resources>
