@@ -20,20 +20,23 @@ public class resultActivity extends Activity {
 		  //drop-down menu for saving duration of read cycle
 		  final Spinner dur_spinner = (Spinner) findViewById(R.id.dur_cycle_spinner);
 		  
+		  // ---- Number of APs Spinner
 		  ArrayAdapter<CharSequence> adapter_1 = ArrayAdapter.createFromResource(this, R.array.num_aps_array, android.R.layout.simple_spinner_item);
 		  adapter_1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		  
 		  ap_spinner.setAdapter(adapter_1);
-
+		  ap_spinner.setSelection(SavedSettings.num_of_aps - 1);
+		  
+		  // ---- Number of Max Reads Spinner
 		  ArrayAdapter<CharSequence> adapter_2 = ArrayAdapter.createFromResource(this, R.array.num_reads_array, android.R.layout.simple_spinner_item);
 		  adapter_2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		  
 		  read_spinner.setAdapter(adapter_2);
+		  read_spinner.setSelection(SavedSettings.num_of_saved_reads - 1);
 		  
+		  // ---- Duration of Cycle Spinner
 		  ArrayAdapter<CharSequence> adapter_3 = ArrayAdapter.createFromResource(this, R.array.dur_cycle_array, android.R.layout.simple_spinner_item);
 		  adapter_3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		  
 		  dur_spinner.setAdapter(adapter_3);
+		  dur_spinner.setSelection(SavedSettings.dur_read_cycle - 1);
 		  
 		  //Location save button and listener
 		  Button save = (Button) findViewById(R.id.save_settings);

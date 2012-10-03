@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -37,11 +39,11 @@ public class apviewActivity extends Activity {
 	 
 	 //delay before app scans for access points
 	 int read_latency = SavedSettings.dur_read_cycle * 1000;
-	 //int read_latency = 1000;
 	 //max number of continuously stored access point data based on time
 	 int max_list_stored = SavedSettings.num_of_saved_reads;
-	 //int max_list_stored = 3;
-
+	 //max number of access points saved during a cycle
+	 int max_aps_saved = SavedSettings.num_of_aps;
+	 
 	 //# of reads since last save
 	 int reads_since_save = 0;
 	 
@@ -69,6 +71,7 @@ public class apviewActivity extends Activity {
 		  mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
 		  registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		  //start scan
 		  readAPs();
 		  
 		  //drop-down menu for selecting location
@@ -81,15 +84,14 @@ public class apviewActivity extends Activity {
 		  //Location save button and listener
 		  Button save = (Button) findViewById(R.id.save_location);
 		  
-		  //final Context ctx = this;
-		  
 		  save.setOnClickListener(new View.OnClickListener() {
 		  
 			public void onClick(View v) {
-				//ProgressDialog dialog = ProgressDialog.show(ctx, "Loading", "Reading data, please refrain from moving for... " + (max_list_stored) + " seconds", true);
-
+				
 				locs.put(spinner.getSelectedItem().toString(), new ArrayList<ArrayList<AccessPoint>>(latest_reads));
 				reads_since_save = 0;
+				//Rest.connect("http://pointofusesolutions.com/kroger/processors/admin_mode.php?action=get_location_and_ap");
+
 			}
 			
 		  });
@@ -117,6 +119,7 @@ public class apviewActivity extends Activity {
 	 
 	 //Grabs two data reads with all associated access points and find the difference between them
 	 //and returns the average delta of those access points
+	 //So confusing don't even try to figure it out, arraylist-ception!
 	 public float compareAP(ArrayList<ArrayList<AccessPoint>> current_aps, ArrayList<ArrayList<AccessPoint>> saved_aps) {
 		float total = 0;
 		int count = 0;
@@ -139,10 +142,11 @@ public class apviewActivity extends Activity {
 			}
 			
 		}
-		
+
 		for (ArrayList<AccessPoint> s : saved_aps) {
 			
 			for (AccessPoint sav : s) {
+
 				if (saved_avg.containsKey(sav.getBSSID())) {
 					float tmp_val = (saved_avg.get(sav.getBSSID()) + sav.getSS()) / 2;
 					saved_avg.put(sav.getBSSID(), tmp_val);
@@ -155,12 +159,13 @@ public class apviewActivity extends Activity {
 		
 		for (Map.Entry<String, Float> sa : saved_avg.entrySet()) {
 			for (Map.Entry<String, Float> cu : current_avg.entrySet()) {
+				
 				if (sa.getKey().equals(cu.getKey())) {
 					float delta = Math.abs(sa.getValue() - cu.getValue());
 					total += delta;
 					count++;
 					break;
-				}
+				} 
 			}
 		}
 		
@@ -172,15 +177,16 @@ public class apviewActivity extends Activity {
 			//e.g. LOC1.) 93% success rate with avg delta of 2 : 1.07*2 = 2.14
 			//e.g. LOC2.) 65% success rate with avg delta of 2 : 1.35*2 = 2.7
 			// 2.14 < 2.70 = LOC1 wins even though the delta between the two locations is 0.
-			ap_success_rate = count / saved_avg.size();
+			ap_success_rate = (float) count / (float) saved_avg.size();
 			//doesn't work if there is 100% success rate so i'm going to make 
 			if (ap_success_rate != 1) {
 				float diff = 2 - ap_success_rate;
 				avg = avg * diff;
-			} else { avg = (float) (avg * 1.01); }
+			 } else { avg = (float) (avg * 1.01); }
 		}
 		
 		return avg;
+		//return avg + " -- " + (ap_success_rate*100) + "% success; cur: " + count + " saved: " + saved_avg.size();
 	 }
 	 
 	 //over ride onStart, which is part of an app's lifecycle
@@ -189,14 +195,12 @@ public class apviewActivity extends Activity {
 		 readAPs();
 	 }
 	 
+	 //After activity gets focus again
 	 protected void onResume() {
 		 super.onResume();
-		//delay before app scans for access points
 		 read_latency = SavedSettings.dur_read_cycle * 1000;
-		 //int read_latency = 1000;
-		 //max number of continuously stored access point data based on time
 		 max_list_stored = SavedSettings.num_of_saved_reads;
-		 //int max_list_stored = 3;
+		 max_aps_saved = SavedSettings.num_of_aps;
 	 }
 	 
 	 //over ride onStop, which is part of an app's lifecycle
@@ -229,24 +233,6 @@ public class apviewActivity extends Activity {
 		  mainWifi.startScan();
 	 }
 	 
-	 //grabs current wifi state based on the method getWifiState()
-	 public String getWifiStateStr() {
-		    switch (mainWifi.getWifiState()) {
-		      case WifiManager.WIFI_STATE_DISABLING:
-		        return "disabling";
-		      case WifiManager.WIFI_STATE_DISABLED:
-		        return "disabled";
-		      case WifiManager.WIFI_STATE_ENABLING:
-		        return "enabling";
-		      case WifiManager.WIFI_STATE_ENABLED:
-		        return "enabled";
-		      case WifiManager.WIFI_STATE_UNKNOWN:
-		        return "unknown";
-		      default:
-		        return null;  //or whatever you want for an error string
-		    }
-	 }
-	 
 	 class WifiReceiver extends BroadcastReceiver {
 		 
 		  public void onReceive(Context c, Intent intent) {
@@ -259,6 +245,8 @@ public class apviewActivity extends Activity {
 				int calcLevel;
 				//array list for temporary key storage of last reads
 				ArrayList<AccessPoint> current_aps = new ArrayList<AccessPoint>();
+				String win_name = "";
+				//float win_val = 0;
 				
 				for(int i = 0; i < wifiList.size(); i++){
 					AccessPoint ap = new AccessPoint();
@@ -272,20 +260,30 @@ public class apviewActivity extends Activity {
 					
 					display_post += "\nSSID: " + s.SSID + "\n -- BSSID: " + s.BSSID + "\n -- Signal: " + calcLevel;
 				}
-
+				
+				//only save the top allowed access points
+				Collections.sort(current_aps, new CustomComparator());
+				
+				if (current_aps.size() > max_aps_saved) {
+					System.out.println("CURRENT AP SIZE TOO BIG");
+					int tmp_diff = current_aps.size() - max_aps_saved;
+					for (int i = 0; i < tmp_diff; i++) {
+						current_aps.remove(0);
+						System.out.println("CURRENT AP REMOVED");
+					}
+				}
+				
 				//add the array list referencing all the access point objects to hashmap for latest reads
 				latest_reads.add(current_aps);
 				reads_since_save++;
 				
-				//TODO: only keep latest "max_list_stored" in latest_reads hashmap
+				//only keep latest "max_list_stored" in latest_reads hashmap
 				if (latest_reads.size() > max_list_stored) {
-					latest_reads.remove(0);
+					int tmp_diff = latest_reads.size() - max_list_stored;
+					for (int i = 0; i < tmp_diff; i++) {
+						latest_reads.remove(0);
+					}
 				}
-				
-				//pass data to resultActivity
-				//Intent i = getParent().getIntent(); //new Intent(getApplicationContext(), resultActivity.class);
-				//i.putExtra("cur_ap", build_post);
-				//startActivity(i);
 				
 				//if hashmap data that has saved location i.e. LOC1 access point data has data then we compare current
 				//ap data and the saved location ap data
@@ -293,16 +291,35 @@ public class apviewActivity extends Activity {
 					
 					String winner_out = "";
 					float value = 0;
-					
 					TextView loc_winner = (TextView) findViewById(R.id.loc_winner);
+					TextView loc_results = (TextView) findViewById(R.id.loc_results);
+					HashMap<String, Float> winner = new HashMap<String, Float>();
 					
 					for (Map.Entry<String, ArrayList<ArrayList<AccessPoint>>> entry : locs.entrySet()) {
-						value = compareAP(entry.getValue(), latest_reads);
+						value = compareAP(latest_reads, entry.getValue());
 
+						winner.put(entry.getKey(), value);
 						winner_out += entry.getKey() + ": " + value + "\n";
+						
 					}
 					
-					loc_winner.setText(winner_out);
+					ArrayList<Float> find_loc = new ArrayList<Float>();
+					for (Map.Entry<String, Float> sort : winner.entrySet()) {
+						find_loc.add(sort.getValue());
+					}
+					
+					Collections.sort(find_loc);
+					
+					for (Map.Entry<String, Float> sort : winner.entrySet()) {
+						if (find_loc.get(0) == sort.getValue()) {
+							win_name = sort.getKey();
+							//win_val = sort.getValue();
+						}
+					}
+					
+					loc_winner.setTextColor(Color.RED);
+					loc_winner.setText("Winner: " + win_name + "\n");
+					loc_results.setText(winner_out);
 					
 				}
 				
@@ -310,7 +327,7 @@ public class apviewActivity extends Activity {
 				
 				//String wifiState = getWifiStateStr();
 				show_aps.setMovementMethod(new ScrollingMovementMethod());
-				show_aps.setText("Stored Reads: " + latest_reads.size() + "\nReads Since Last Save: " + reads_since_save + "\n" + info + "\n" + display_post);
+				show_aps.setText("Stored Reads: " + latest_reads.size() + "\nReads Since Last Save: " + reads_since_save + "\nSaved APs Per Read: " + current_aps.size() + "\n" + info + "\n" + display_post);
 				
 				//do it again
 				Timer t = new Timer();

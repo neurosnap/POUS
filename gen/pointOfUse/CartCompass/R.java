@@ -20,17 +20,18 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int ap_reads=0x7f060003;
-        public static final int dur_cycle=0x7f060008;
-        public static final int dur_cycle_spinner=0x7f060009;
+        public static final int ap_reads=0x7f060004;
+        public static final int dur_cycle=0x7f060009;
+        public static final int dur_cycle_spinner=0x7f06000a;
+        public static final int loc_results=0x7f060001;
         public static final int loc_winner=0x7f060000;
-        public static final int num_aps=0x7f060004;
-        public static final int num_aps_spinner=0x7f060005;
-        public static final int num_reads=0x7f060006;
-        public static final int num_reads_spinner=0x7f060007;
-        public static final int save_location=0x7f060002;
-        public static final int save_settings=0x7f06000a;
-        public static final int spinner1=0x7f060001;
+        public static final int num_aps=0x7f060005;
+        public static final int num_aps_spinner=0x7f060006;
+        public static final int num_reads=0x7f060007;
+        public static final int num_reads_spinner=0x7f060008;
+        public static final int save_location=0x7f060003;
+        public static final int save_settings=0x7f06000b;
+        public static final int spinner1=0x7f060002;
     }
     public static final class layout {
         public static final int apview=0x7f030000;
@@ -41,7 +42,7 @@ public final class R {
         public static final int app_name=0x7f040000;
         public static final int dur_cycle_spinner_text=0x7f04000b;
         public static final int dur_cycle_text=0x7f04000a;
-        public static final int loc_winner_text=0x7f040004;
+        public static final int loc_results_text=0x7f040004;
         public static final int locations=0x7f040005;
         public static final int num_aps_spinner_text=0x7f040007;
         public static final int num_aps_text=0x7f040006;

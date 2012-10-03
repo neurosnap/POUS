@@ -4,7 +4,7 @@
     <string name="update_locs">Update APs</string>
     <string name="save_locs">Save Loc</string>
     <string name="update_pos">Current APs Loading ...</string>
-    <string name="loc_winner_text">Winner not available until two locations are saved</string>
+    <string name="loc_results_text">Winner not available until two locations are saved</string>
     <string name="locations">Choose a Location</string>
     
     <string-array name="locations_array">
